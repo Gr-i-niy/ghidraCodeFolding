@@ -54,14 +54,14 @@ import ghidra.util.*;
 import ghidra.util.bean.field.AnnotatedTextFieldElement;
 import ghidra.util.task.SwingUpdateManager;
 
-//modified
+
 import javax.swing.KeyStroke;
 import java.awt.event.KeyEvent;
 
 /**
  * Class to handle the display of a decompiled function
  */
-public class DecompilerPanel extends JPanel implements FieldMouseListener, FieldLocationListener, FieldInputListener, //modified
+public class DecompilerPanel extends JPanel implements FieldMouseListener, FieldLocationListener, FieldInputListener, 
 		FieldSelectionListener, ClangHighlightListener, LayoutListener {
 
 	private final static Color NON_FUNCTION_BACKGROUND_COLOR_DEF = new GColor("color.bg.undefined");
@@ -775,8 +775,8 @@ public class DecompilerPanel extends JPanel implements FieldMouseListener, Field
 			toggleMiddleMouseHighlight(location, field);
 		}
 	}
-//modified
-	public static final KeyStroke SELECT = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+
+	public static final KeyStroke SELECT = KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0);
 	public static final KeyStroke HIDE = KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0);
 	public static final KeyStroke SHOW = KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0);
 
@@ -806,7 +806,7 @@ public class DecompilerPanel extends JPanel implements FieldMouseListener, Field
 			}
 		}
 	}
-//modified
+
 	private void toggleCollapseToken(ClangSyntaxToken firstToken, boolean isCollapsed) {
 		if (DecompilerUtils.isBrace(firstToken)) {
 			ClangSyntaxToken closingBrace = DecompilerUtils.getMatchingBrace(firstToken);

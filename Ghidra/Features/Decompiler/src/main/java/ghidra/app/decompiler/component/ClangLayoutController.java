@@ -160,17 +160,6 @@ public class ClangLayoutController implements LayoutModel, LayoutModelListener {
 private ClangTextField createTextFieldForLine(ClangLine line, int lineCount,
 			boolean paintLineNumbers) {
 		List<ClangToken> tokens = line.getAllTokens();
-		
-// ============ MY MODIFICATION ===================
-		// Using an iterator to remove tokens with a collapsed flag
-                Iterator<ClangToken> iterator = tokens.iterator();
-                while (iterator.hasNext()) {
-        	        ClangToken tk = iterator.next();
-                    if (tk.getCollapsedToken()) {
-                        iterator.remove();
-                    }
-                }
-// =====================================
 
 		FieldElement[] elements = createFieldElementsForLine(tokens);
 
@@ -186,6 +175,9 @@ private ClangTextField createTextFieldForLine(ClangLine line, int lineCount,
 		int columnPosition = 0;
 		for (int i = 0; i < tokens.size(); ++i) {
 			ClangToken token = tokens.get(i);
+			if (token.getCollapsedToken()) {
+				continue;
+			}
 			Color color = syntaxColor[token.getSyntaxType()];
 			if (token instanceof ClangCommentToken) {
 				AttributedString prototype = new AttributedString("prototype", color, metrics);

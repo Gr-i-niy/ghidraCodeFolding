@@ -609,11 +609,6 @@ public class DecompilerUtils {
 			ClangTextField textLine = (ClangTextField) lines[i];
 			List<ClangToken> tokens = textLine.getTokens();
 			
-			// ============= ADDED LINES =======
-			if (tokens.size() == 0)
-				continue;
-			// ===========================
-			
 			ClangToken addressedToken = findClosestAddressedToken(tokens.get(0));
 			if (addressedToken != null) {
 				return addressedToken.getMinAddress();
@@ -826,6 +821,9 @@ public class DecompilerUtils {
 		for (; i < alltoks.size(); ++i) {
 
 			ClangToken tok = (ClangToken) alltoks.get(i);
+			if (tok.getCollapsedToken()) {
+				continue;
+			}
 			if (tok instanceof ClangBreak) {
 				lines.add(current);
 				brk = (ClangBreak) tok;
