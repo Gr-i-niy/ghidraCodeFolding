@@ -54,10 +54,14 @@ import ghidra.util.*;
 import ghidra.util.bean.field.AnnotatedTextFieldElement;
 import ghidra.util.task.SwingUpdateManager;
 
+//modified
+import javax.swing.KeyStroke;
+import java.awt.event.KeyEvent;
+
 /**
  * Class to handle the display of a decompiled function
  */
-public class DecompilerPanel extends JPanel implements FieldMouseListener, FieldLocationListener,
+public class DecompilerPanel extends JPanel implements FieldMouseListener, FieldLocationListener, FieldInputListener, //modified
 		FieldSelectionListener, ClangHighlightListener, LayoutListener {
 
 	private final static Color NON_FUNCTION_BACKGROUND_COLOR_DEF = new GColor("color.bg.undefined");
@@ -771,8 +775,76 @@ public class DecompilerPanel extends JPanel implements FieldMouseListener, Field
 			toggleMiddleMouseHighlight(location, field);
 		}
 	}
+//modified
+	public static final KeyStroke SELECT = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+	public static final KeyStroke HIDE = KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0);
+	public static final KeyStroke SHOW = KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0);
 
-	private void tryToGoto(FieldLocation location, Field field, MouseEvent event,
+	@Override
+	public void keyPressed(KeyEvent ev, BigInteger index, int fieldNum, int row, int col, Field field) {
+		KeyStroke keyStroke = KeyStroke.getKeyStrokeForEvent(ev);
+		FieldLocation location = getCursorPosition();
+		ClangTextField textField = (ClangTextField) field;
+		ClangToken token = textField.getToken(location);
+
+		if (SELECT.equals(keyStroke)) {
+			if (DockingUtils.isControlModifier(ev)) {
+				tryToGoto(location, field, ev, true);
+			}
+			else {
+				tryToGoto(location, field, ev, false);
+			}
+		}
+		else if (SHOW.equals(keyStroke)) {
+			if (token instanceof ClangSyntaxToken) {
+				toggleCollapseToken((ClangSyntaxToken) token, false);
+			}
+		}
+		else if (HIDE.equals(keyStroke)) {
+			if (token instanceof ClangSyntaxToken) {
+				toggleCollapseToken((ClangSyntaxToken) token, true);
+			}
+		}
+	}
+//modified
+	private void toggleCollapseToken(ClangSyntaxToken firstToken, boolean isCollapsed) {
+		if (DecompilerUtils.isBrace(firstToken)) {
+			ClangSyntaxToken closingBrace = DecompilerUtils.getMatchingBrace(firstToken);
+			if (closingBrace == null) {
+				return;
+			}
+			ClangSyntaxToken openingBrace = firstToken;
+			if ("}".equals(firstToken.getText())) {
+				openingBrace = closingBrace;
+				closingBrace = firstToken;
+			}
+
+			ClangNode parent = firstToken.Parent();
+			List<ClangNode> list = new ArrayList<>();
+			parent.flatten(list);
+
+			boolean inSection = false;
+			for (ClangNode element : list) {
+				ClangToken token = (ClangToken) element;
+				if (inSection) {
+					if ((token instanceof ClangSyntaxToken)) {
+						inSection = (!token.equals(closingBrace));
+					}
+					if (inSection) {
+						token.setCollapsedToken(isCollapsed);
+					}
+				}
+				else if ((token instanceof ClangSyntaxToken)) {
+					inSection |= (token.equals(openingBrace));
+				}
+			}
+
+			// IMPORTANT: to trigger redisplay
+			setDecompileData(decompileData);
+		}
+	}
+
+	private void tryToGoto(FieldLocation location, Field field, InputEvent event,
 			boolean newWindow) {
 		if (!navitationEnabled) {
 			return;
@@ -797,7 +869,7 @@ public class DecompilerPanel extends JPanel implements FieldMouseListener, Field
 		}
 	}
 
-	private void tryGoToComment(FieldLocation location, MouseEvent event, ClangTextField textField,
+	private void tryGoToComment(FieldLocation location, InputEvent event, ClangTextField textField,
 			boolean newWindow) {
 
 		// comments may use annotations; tell the annotation it was clicked

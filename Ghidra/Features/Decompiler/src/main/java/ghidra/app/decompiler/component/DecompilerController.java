@@ -31,6 +31,7 @@ import ghidra.program.util.ProgramLocation;
 import ghidra.program.util.ProgramSelection;
 import ghidra.util.bean.field.AnnotatedTextFieldElement;
 import utility.function.Callback;
+import java.awt.event.InputEvent;
 
 /**
  * Coordinates the interactions between the DecompilerProvider, DecompilerPanel, and the
@@ -270,7 +271,7 @@ public class DecompilerController {
 		callbackHandler.selectionChanged(programSelection);
 	}
 
-	void annotationClicked(AnnotatedTextFieldElement annotation, MouseEvent event,
+	void annotationClicked(AnnotatedTextFieldElement annotation, InputEvent event,
 			boolean newWindow) {
 		callbackHandler.annotationClicked(annotation, newWindow);
 	}

@@ -51,7 +51,17 @@ public class ClangToken implements ClangNode {
 	private int syntax_type;
 	private Color highlight; // Color to highlight with or null if no highlight
 	private boolean matchingToken;
+	//modified
+	private boolean collapsedToken = false;
 
+    public boolean getCollapsedToken() {
+        return collapsedToken;
+    }
+
+    public void setCollapsedToken(boolean collapsedToken) {
+        this.collapsedToken = collapsedToken;
+    }
+//modified
 	public ClangToken(ClangNode par) {
 		parent = par;
 		text = null;

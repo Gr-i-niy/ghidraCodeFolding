@@ -608,6 +608,12 @@ public class DecompilerUtils {
 		for (int i = lineNumber - 1; i >= 0; i--) {
 			ClangTextField textLine = (ClangTextField) lines[i];
 			List<ClangToken> tokens = textLine.getTokens();
+			
+			// ============= ADDED LINES =======
+			if (tokens.size() == 0)
+				continue;
+			// ===========================
+			
 			ClangToken addressedToken = findClosestAddressedToken(tokens.get(0));
 			if (addressedToken != null) {
 				return addressedToken.getMinAddress();

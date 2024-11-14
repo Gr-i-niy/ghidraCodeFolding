@@ -31,6 +31,8 @@ import ghidra.app.util.viewer.field.CommentUtils;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.pcode.HighFunction;
+import java.util.Iterator;
+
 
 /**
  * Control the GUI layout for displaying tokenized C code
@@ -155,9 +157,20 @@ public class ClangLayoutController implements LayoutModel, LayoutModelListener {
 		return fieldList;
 	}
 
-	private ClangTextField createTextFieldForLine(ClangLine line, int lineCount,
+private ClangTextField createTextFieldForLine(ClangLine line, int lineCount,
 			boolean paintLineNumbers) {
 		List<ClangToken> tokens = line.getAllTokens();
+		
+// ============ MY MODIFICATION ===================
+		// Using an iterator to remove tokens with a collapsed flag
+                Iterator<ClangToken> iterator = tokens.iterator();
+                while (iterator.hasNext()) {
+        	        ClangToken tk = iterator.next();
+                    if (tk.getCollapsedToken()) {
+                        iterator.remove();
+                    }
+                }
+// =====================================
 
 		FieldElement[] elements = createFieldElementsForLine(tokens);
 
@@ -165,7 +178,7 @@ public class ClangLayoutController implements LayoutModel, LayoutModelListener {
 		int updatedMaxWidth = maxWidth;
 		return new ClangTextField(tokens, elements, indent, line.getLineNumber(), updatedMaxWidth,
 			hlFactory);
-	}
+}
 
 	private FieldElement[] createFieldElementsForLine(List<ClangToken> tokens) {
 
